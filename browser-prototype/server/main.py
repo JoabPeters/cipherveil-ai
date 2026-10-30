@@ -44,4 +44,4 @@ def chat(request: ChatRequest):
         raise HTTPException(status_code=502, detail=f"AI provider request failed: {type(exc).__name__}") from exc
 
 # Serve the browser application from the same origin as the API.
-app.mount("/", StaticFiles(directory=ROOT / "browser-prototype", html=True), name="browser")
+app.mount("/", StaticFiles(directory=ROOT, html=True), name="browser")
