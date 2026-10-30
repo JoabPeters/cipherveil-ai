@@ -83,9 +83,11 @@ def call_model(prompt, api_key, model):
 st.title("🔐 CipherVeil AI")
 st.caption("An experimental privacy gateway for AI · Built by Joab Peters")
 st.markdown("""
-<div class="cv-card"><b>Privacy boundary</b><br>
-Recognized sensitive values are encrypted in this app session and replaced with placeholders before an optional AI request.
-The model does not receive the master key or those original protected values. Ordinary prompt text and request metadata may still reach the provider.
+<div class="cv-warning"><b>Important hosting notice</b><br>
+This Python application runs on its hosting server. Your original prompt reaches that server before detection and encryption occur. When you request a live AI response, only the sanitized prompt is sent to the configured AI provider. The hosting server can process the original prompt. Do not enter real passwords, API secrets, financial information, or sensitive personal data.
+</div>
+<div class="cv-card"><b>AI-provider boundary</b><br>
+Recognized sensitive values are encrypted in the app session and replaced with placeholders before an optional AI request. The AI provider does not receive the master key or those recognized original values. Ordinary prompt text and request metadata may still reach the provider.
 </div>""", unsafe_allow_html=True)
 
 with st.sidebar:
