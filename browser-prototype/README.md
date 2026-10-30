@@ -30,7 +30,7 @@ Python 3.10+ is recommended.
 
 5. Start the server from the repository root:
 
-   `uvicorn browser-prototype.server.main:app --reload`
+   `uvicorn main:app --app-dir browser-prototype/server --reload`
 
 6. Open `http://127.0.0.1:8000`.
 
