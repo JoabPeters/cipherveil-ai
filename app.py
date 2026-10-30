@@ -81,7 +81,7 @@ def call_model(prompt, api_key, model):
     return response.choices[0].message.content
 
 st.title("🔐 CipherVeil AI")
-st.caption("A local-first privacy gateway for AI · Built by Joab Peters")
+st.caption("An experimental privacy gateway for AI · Built by Joab Peters")
 st.markdown("""
 <div class="cv-card"><b>Privacy boundary</b><br>
 Recognized sensitive values are encrypted in this app session and replaced with placeholders before an optional AI request.
@@ -95,8 +95,8 @@ with st.sidebar:
     model = st.text_input("Model name", value="gpt-4o-mini")
     st.divider()
     st.subheader("Session key")
-    st.success("AES-256-GCM key generated in memory")
-    st.caption("The key is not shown or sent to the model. Refreshing starts a new session.")
+    st.success("AES-256-GCM key generated in app session memory")
+    st.caption("The key is not sent to the AI provider. Refreshing starts a new session.")
     if st.button("Reset session and vault"):
         st.session_state.key = AESGCM.generate_key(bit_length=256)
         st.session_state.vault = []
@@ -119,7 +119,7 @@ with left:
             st.session_state.vault = items
             st.session_state.audit = [{
                 "time": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-                "event": "LOCAL_PROTECTION",
+                "event": "SERVER_SESSION_PROTECTION",
                 "recognized_values": len(items),
                 "api_called": False,
             }]
@@ -152,7 +152,7 @@ with right:
     st.metric("Encrypted values", len(st.session_state.vault))
     st.metric("Master key sent to model", "No")
     st.metric("Original detected values sent", "No*" if st.session_state.vault else "Not tested")
-    st.markdown('<div class="cv-card"><b>Encrypted local vault</b><br>Ciphertext is held in session memory and is not included in the model request.</div>', unsafe_allow_html=True)
+    st.markdown('<div class="cv-card"><b>Encrypted app-session vault</b><br>Ciphertext is held in application session memory and is not included in the AI request.</div>', unsafe_allow_html=True)
     if st.session_state.vault:
         for item in st.session_state.vault:
             with st.expander(f'{item["token"]} · {item["type"]}'):
@@ -172,7 +172,7 @@ st.subheader("Security boundaries")
 st.markdown("""
 - **Encryption:** AES-256-GCM from the `cryptography` library; a fresh 12-byte nonce is used for each value.
 - **Key handling:** a random key exists in application session memory and is never added to the prompt.
-- **Privacy model:** recognized fields are encrypted locally and omitted from the external model request.
-- **Limitations:** detection is incomplete; the key is ephemeral; ordinary prompt text and metadata may be transmitted; the app does not guarantee protection from host compromise, all logs, browser extensions, or side-channel attacks.
+- **AI-provider boundary:** recognized fields are encrypted in the app session and omitted from the external model request.
+- **Hosting boundary:** the current Streamlit server receives the original prompt before the Python code protects recognized values. This is not client-side encryption.\n- **Limitations:** detection is incomplete; the key is ephemeral; ordinary prompt text and metadata may be transmitted; the app has not undergone an independent security audit and does not yet implement secret sharing.
 - **Safety:** never paste real passwords, API secrets, financial data, or sensitive personal information into this hackathon prototype.
 """)
