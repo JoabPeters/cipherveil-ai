@@ -1,22 +1,27 @@
 # CipherVeil AI
 
-**A local-first privacy gateway for AI — by Joab Peters**
+**An experimental privacy gateway for AI — by Joab Peters**
 
-This hackathon prototype demonstrates protecting selected sensitive values before an optional hosted-LLM request. Values matched locally are encrypted with AES-256-GCM and replaced with placeholders; the model receives only the sanitized prompt.
+CipherVeil AI demonstrates detecting selected sensitive values in a prompt, encrypting recognized values with AES-256-GCM, and replacing them with placeholders before an optional hosted-LLM request.
 
-## Features
-- Local pattern detection for email addresses, phone-like values, and 10–12 digit identifiers.
+## Current prototype features
+
+- Pattern-based detection for email addresses, phone-like values, and 10–12 digit identifiers.
 - AES-256-GCM encryption for recognized values.
-- Ephemeral 256-bit key held in app session memory and never sent to the model.
-- Dashboard for sanitized prompt, ciphertext, and audit events.
-- Optional live AI request using the sanitized prompt.
+- An ephemeral 256-bit key held in the Streamlit application session and never sent to the AI provider.
+- A dashboard for sanitized prompts, ciphertext, and basic audit events.
+- Optional live AI requests using the sanitized prompt.
 
-## Security limitations
-This is a prototype, not a production security product or formal security guarantee. Detection is incomplete. Ordinary prompt text and request metadata may reach the provider. The local runtime, dependencies, browser, and host remain trusted components. Refreshing the app loses the session key. This does not guarantee resistance to all prompt injection, side-channel attacks, logging exposure, or host compromise.
+## Important deployment and privacy limitation
 
-Do not enter real passwords, API secrets, financial details, or sensitive personal data.
+The current app is a Python Streamlit application. When deployed to Streamlit Community Cloud, its Python code runs on Streamlit's servers, not in the visitor's browser. The original prompt therefore reaches the Streamlit hosting environment before detection and encryption occur.
+
+When a user explicitly requests a live AI response, the app sends the sanitized prompt to the configured AI provider. The encryption key and recognized original values are not included in that AI request.
+
+**This prototype does not protect the original prompt from the application host. Do not enter real passwords, API secrets, financial information, or sensitive personal data.** See [SECURITY.md](SECURITY.md) for the current data-flow explanation and intended security improvements.
 
 ## Run locally
+
 Python 3.10+ recommended.
 
 ```bash
@@ -24,6 +29,7 @@ python -m venv .venv
 ```
 
 Windows PowerShell:
+
 ```powershell
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
@@ -31,6 +37,7 @@ streamlit run app.py
 ```
 
 macOS/Linux:
+
 ```bash
 source .venv/bin/activate
 pip install -r requirements.txt
@@ -40,7 +47,11 @@ streamlit run app.py
 Open the local URL printed in the terminal, usually `http://localhost:8501`.
 
 ## Optional live AI
-Enter your API key in the app sidebar. Do not commit API keys to GitHub. API access may incur charges and depends on your provider account. Local encryption/redaction can be demonstrated without a key.
 
-## Track
+Enter your API key in the app sidebar. Do not commit API keys to GitHub. API access may incur charges and depends on your provider account. The local development server or hosted Streamlit server handles the key for the request.
+
+## Hackathon direction
+
 Mathematics for Systems Security — AI Pipeline Secret Sharing.
+
+The current prototype demonstrates encryption and prompt sanitization; it does **not yet implement a secret-sharing protocol**. That is a separate required engineering milestone, not a feature we claim is already complete.
